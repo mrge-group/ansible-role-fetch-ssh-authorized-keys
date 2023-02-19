@@ -1,0 +1,27 @@
+---
+
+galaxy_info:
+  author: Per H. <github.com/perfide>
+  description: Fetch `.ssh/authorized_keys` files
+  galaxy_tags:
+  - ssh
+  - authorized_keys
+  - fetch
+  - slurp
+  license: BSD-2
+  min_ansible_version: 1.7
+  platforms:
+  - name: CentOS
+    versions:
+    - all
+  - name: Debian
+    versions:
+    - all
+  - name: RedHat
+    versions:
+    - all
+  - name: Ubuntu
+    versions:
+    - all
+
+...
