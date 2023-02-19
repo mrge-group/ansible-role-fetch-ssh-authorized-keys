@@ -1,0 +1,51 @@
+---
+
+- name: Install Python3 (RedHat)
+  ansible.builtin.yum:
+    name: python3
+    state: present
+  when: ansible_distribution_file_variety == 'RedHat'
+
+- name: Install Python (Debian)
+  ansible.builtin.apt:
+    name: python3
+    state: present
+  when: ansible_distribution_file_variety == 'Debian'
+
+- name: fetch_authorized_keys
+  fetch_authorized_keys:
+  register: fetched_result
+
+- name: Get local working directory
+  become: false
+  local_action:
+    module: set_fact
+    fetch_authorized_keys_cwd: "{{ lookup('env', 'PWD') }}/fetched_keys"
+
+- name: Create local sub-directory
+  become: false
+  local_action:
+    module: file
+    path: "{{ fetch_authorized_keys_cwd }}/"
+    state: directory
+    mode: '0750'
+
+- name: Create local per-user sub-directory
+  become: false
+  local_action:
+    module: file
+    path: "{{ fetch_authorized_keys_cwd }}/{{ item.key }}/"
+    state: directory
+    mode: '0750'
+  with_dict: "{{ fetched_result['authorized_keys'] }}"
+
+- name: Write variable to local file
+  become: false
+  local_action:
+    module: copy
+    content: "{{ item.value | join('\n') }}"
+    dest: "{{ fetch_authorized_keys_cwd }}/{{ item.key }}/{{ inventory_hostname_short }}"
+    mode: '0400'
+  with_dict: "{{ fetched_result['authorized_keys'] }}"
+
+...
